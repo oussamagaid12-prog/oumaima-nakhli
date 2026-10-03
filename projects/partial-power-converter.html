@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partial-power DC-DC converter 48 V / 5.5 kW · Oumaima Nakhli</title>
+<meta name="description" content="Final-year project at LAPLACE: design, simulation, PCB and thermal analysis of a transformerless partial-power 48 V / 5.5 kW DC-DC converter.">
+<meta property="og:title" content="Partial-power DC-DC converter 48 V / 5.5 kW · Oumaima Nakhli">
+<meta property="og:description" content="Final-year project at LAPLACE: design, simulation, PCB and thermal analysis of a transformerless partial-power 48 V / 5.5 kW DC-DC converter.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f3d4c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="../index.html">Oumaima Nakhli</a>
+    <button class="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav" aria-label="Main">
+      <ul>
+<li class=""><a href="../index.html">Home</a></li>
+<li class="has-sub"><a href="../projects/index.html" aria-current="page">Projects</a><ul class="sub"><li><a href="../projects/partial-power-converter.html">Partial-power converter</a></li><li><a href="../projects/buck-converter.html">Buck converter 12 V → 5 V</a></li><li><a href="../projects/bms-3s.html">3S Battery Management System</a></li></ul></li>
+<li class=""><a href="../teaching.html">Teaching</a></li>
+<li class="has-sub"><a href="../about/index.html">About</a><ul class="sub"><li><a href="../about/biography.html">Biography</a></li><li><a href="../about/resume.html">Résumé</a></li><li><a href="../about/contact.html">Contact</a></li></ul></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main" class="">
+
+<p class="crumbs"><a href="index.html">Projects</a> / Partial-power converter</p>
+<h1>Transformerless partial-power DC-DC converter, 48&nbsp;V / 5.5&nbsp;kW</h1>
+<p class="meta">Final-year project (PFE) · LAPLACE, CNRS / INP-ENSEEIHT, Toulouse · March to July 2026<br>
+Supervisors: Thierry Meynard (host laboratory), Sami Hassine (ENIM)</p>
+<p class="tags"><span>Partial power processing</span><span>PLECS</span><span>Altium Designer</span><span>MOSFET Si</span><span>PCB 4 layers / EMC</span><span>Thermal design</span></p>
+
+<h2>Summary</h2>
+<p>A conventional DC-DC converter processes all of the power flowing from source to load, so semiconductors, magnetics
+and cooling are all sized for the full power. A <em>partial-power converter</em> (PPC) converts only a fraction of it and
+passes the rest straight through. The gain is largest when input and output voltages are close, as with batteries, fuel
+cells or photovoltaic generators.</p>
+<p>This project covers a non-isolated, transformerless PPC that supplies a <strong>48&nbsp;V bus at 5.5&nbsp;kW</strong> (about 110&nbsp;A) from
+two 30&nbsp;V / 55&nbsp;A batteries. The work follows a complete power-electronics design flow: topology study and simulation,
+component sizing, sensing and protection circuits, high-current PCB layout and thermal analysis.</p>
+
+<figure>
+  <img src="../assets/img/topology.png" alt="Schematic of the converter: two switching cells, one per battery, with outputs in series">
+  <figcaption>Architecture: mirrored topology with crossed inductors and a floating reference. Each battery feeds its own switching cell, and the cell outputs are connected in series to form the 48&nbsp;V bus. Protection and pre-charge circuits sit next to each source.</figcaption>
+</figure>
+
+<h2>Why partial power?</h2>
+<p>The thesis uses the <em>Semiconductor Component Utilization Index</em> (SCUI) to compare architectures. For this topology the
+bus voltage lies between V and 2V, so SCUI ranges from 1 to 2, whereas a classical full-power converter sits between 0 and 1.
+Operation was first validated in PLECS, including the effect of the phase shift between the two interleaved cells on the
+output current and voltage.</p>
+
+<h2>Design at a glance</h2>
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>Input</th><td>2 × 30&nbsp;V batteries, 55&nbsp;A each</td></tr>
+    <tr><th>Output</th><td>48&nbsp;V bus, up to about 110&nbsp;A (5.5&nbsp;kW)</td></tr>
+    <tr><th>Switching frequency</th><td>140&nbsp;kHz, two interleaved cells</td></tr>
+    <tr><th>Power switch</th><td>Infineon ISC018N08NM6SC (OptiMOS™ 6, Si MOSFET)</td></tr>
+    <tr><th>Gate driver</th><td>Infineon 2EDL8024G3CXTMA1, bootstrap high-side supply</td></tr>
+    <tr><th>Power inductors L1, L2</th><td>5.2&nbsp;µH, chosen for a current ripple of roughly 19&nbsp;% of nominal</td></tr>
+    <tr><th>Input decoupling</th><td>28 × 22&nbsp;µF MLCC per cell</td></tr>
+    <tr><th>Tools</th><td>PLECS (simulation), Altium Designer (schematics and PCB), Saturn PCB Toolkit (vias)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Component sizing</h2>
+<p>Inductors, input decoupling capacitors, output capacitors, gate resistors and the bootstrap capacitor and resistor
+were each sized from the reference operating point (30&nbsp;V, 55&nbsp;A per cell, D&nbsp;=&nbsp;0.5, 140&nbsp;kHz) with margins for tolerance and
+operating conditions. Output capacitors are distributed along each cell and at the load.</p>
+
+<h2>Sensing, auxiliary supplies and protection</h2>
+<ul>
+  <li>Auxiliary supply chain and a 5&nbsp;V reference for the acquisition chain.</li>
+  <li>Current and voltage measurement on each branch, with signal conditioning matched to the ADC input range.</li>
+  <li>Over-current detection outputs, short-circuit protection and a dedicated <strong>pre-charge</strong> circuit that limits inrush at power-up.</li>
+  <li>Interface to the microcontroller that generates the PWM signals.</li>
+</ul>
+
+<h2>Power PCB design</h2>
+<figure>
+  <img src="../assets/img/pcb-layout.png" alt="Routed four-layer power PCB with large copper areas and via arrays" loading="lazy">
+  <figcaption>Global routing of the four-layer board designed in Altium Designer.</figcaption>
+</figure>
+<ul>
+  <li><strong>Stack-up:</strong> four layers with 2&nbsp;oz copper. A power and return layer sits just under the top layer so the return current flows tightly under the forward path, keeping the commutation loop inductance low.</li>
+  <li><strong>Separated loops:</strong> the power loop and the gate-drive loop are kept apart, and decoupling capacitors are placed right at each half-bridge.</li>
+  <li><strong>High-current paths:</strong> wide copper pours, solder-mask openings for extra thermal copper, and parallel via arrays.</li>
+  <li><strong>Via count:</strong> with 0.5&nbsp;mm drill / 0.9&nbsp;mm pad vias rated at about 2.8&nbsp;A each (checked with Saturn PCB Toolkit), at least 20 vias are needed per 55&nbsp;A cell and 40 for the 110&nbsp;A common path. The layout uses well above these minimums.</li>
+</ul>
+
+<h2>Loss and thermal analysis</h2>
+<p>Conduction and switching losses were estimated for the MOSFETs, then combined with a thermal resistance chain
+(junction-to-case, case-to-heat-sink, sink-to-ambient). For about 7.1&nbsp;W dissipated per switching leg and a 25&nbsp;°C ambient, the
+estimated junction temperature is about <strong>71&nbsp;°C</strong>, far below the 175&nbsp;°C device limit. The required sink-to-ambient
+resistance for a 125&nbsp;°C junction target is about 13.3&nbsp;°C/W; the selected CTS APF19-19-13CB/A01 forged heat sink reaches
+5.8&nbsp;°C/W with forced convection (200&nbsp;LFM), so the margin is comfortable. One heat sink covers both MOSFETs of each leg.</p>
+
+<h2>Status</h2>
+<p>The design, simulation and PCB layout are complete and the board has been realised. <strong>Experimental validation</strong> is the next
+step: comparing measured voltages, currents, losses and temperatures with the simulated and calculated values.</p>
+
+<h2>Skills used</h2>
+<p class="tags"><span>Power converter design</span><span>PLECS</span><span>Magnetics &amp; capacitor sizing</span><span>Gate-drive design</span><span>Altium Designer</span><span>EMC-aware layout</span><span>Thermal modelling</span><span>PWM generation</span></p>
+
+<h2>Selected references</h2>
+<ol class="refs">
+  <li>T. A. Meynard, H. Renaudineau, P. S. Canales, S. Kouro, D. Concha, A. M. Llor, M. Fadel, H. Schneider, “Partial Power Processing: A Review and New Perspectives,” <em>IEEE Open Journal of the Industrial Electronics Society</em>, 2025. <a href="https://doi.org/10.1109/OJIES.2025.3572429" rel="noopener">doi:10.1109/OJIES.2025.3572429</a></li>
+  <li>J. W. Zapata, S. Kouro, G. Carrasco, H. Renaudineau, T. A. Meynard, “Analysis of Partial Power DC–DC Converters for Two-Stage Photovoltaic Systems,” <em>IEEE J. Emerging Sel. Topics Power Electron.</em>, vol. 7, no. 1, pp. 591–603, 2019.</li>
+  <li>J. Anzola et al., “Review of Architectures Based on Partial Power Processing for DC-DC Applications,” <em>IEEE Access</em>, vol. 8, pp. 103405–103418, 2020.</li>
+</ol>
+
+</main>
+<footer class="site-footer">
+  <div class="inner">
+    <ul class="social" aria-label="Links">
+  <li><a href="mailto:oumaymanakhli95@gmail.com" title="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1.6 2L12 12.4 19.4 7H4.6zM4 9.1V17h16V9.1l-8 5.8-8-5.8z"/></svg><span class="sr">Email</span></a></li>
+  <li><a href="https://linkedin.com/in/oumayma-nakhli" title="LinkedIn" rel="me noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9.75h4V21H3V9.75zM9.5 9.75h3.8v1.54h.05c.53-1 1.82-2.05 3.75-2.05 4 0 4.75 2.63 4.75 6.05V21h-4v-4.9c0-1.17-.02-2.67-1.63-2.67-1.63 0-1.88 1.27-1.88 2.58V21h-4V9.75z"/></svg><span class="sr">LinkedIn</span></a></li>
+  <li><a href="../assets/cv_oumaima_nakhli.pdf" title="Download CV (PDF)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm7 1.5V9h5.5L13 3.5zM7 13h10v1.6H7V13zm0 3.4h10V18H7v-1.6z"/></svg><span class="sr">CV (PDF)</span></a></li>
+</ul>
+    <p>© 2026 Oumaima Nakhli · Built with plain HTML &amp; CSS, hosted on GitHub Pages</p>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
